@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conlang Drawing Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        canvas {
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+        .controls button, .controls select {
+            margin-right: 10px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conlang Script Drawing Interface</h1>
+    <canvas id="drawingCanvas" width="500" height="500"></canvas>
+    <div class="controls">
+        <label for="brushSize">Brush Size:</label>
+        <select id="brushSize">
+            <option value="2">2</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+        </select>
+        
+        <label for="brushColor">Brush Color:</label>
+        <select id="brushColor">
+            <option value="#000000" selected>Black</option>
+            <option value="#FF0000">Red</option>
+            <option value="#0000FF">Blue</option>
+            <option value="#008000">Green</option>
+        </select>
+        
+        <button id="clearCanvas">Clear</button>
+        <button id="submitDrawing">Submit</button>
+    </div>
+    <script>
+        // Setup canvas and context
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        // Set initial brush settings
+        let brushSize = document.getElementById('brushSize').value;
+        let brushColor = document.getElementById('brushColor').value;
+
+        // Event listeners for canvas drawing
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+
+        // Start drawing
+        function startDrawing(event) {
+            drawing = true;
+            draw(event);
+        }
+
+        // Stop drawing
+        function stopDrawing() {
+            drawing = false;
+            ctx.beginPath(); // Prevents lines from connecting between mouse movements
+        }
+
+        // Draw on canvas
+        function draw(event) {
+            if (!drawing) return;
+
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = 'round'; // Rounded edges for brush strokes
+            ctx.strokeStyle = brushColor;
+
+            // Get mouse position relative to the canvas
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        // Update brush size
+        document.getElementById('brushSize').addEventListener('change', (event) => {
+            brushSize = event.target.value;
+        });
+
+        // Update brush color
+        document.getElementById('brushColor').addEventListener('change', (event) => {
+            brushColor = event.target.value;
+        });
+
+        // Clear the canvas
+        document.getElementById('clearCanvas').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        // Submit drawing to backend (placeholder function)
+        document.getElementById('submitDrawing').addEventListener('click', () => {
+            const imageData = canvas.toDataURL(); // Get image data in Base64 format
+            console.log("Submitted Drawing: ", imageData);
+            // Here you can add code to send imageData to the backend
+            // using fetch or AJAX for further processing
+        });
+    </script>
+</body>
+</html>
